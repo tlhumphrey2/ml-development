@@ -1,0 +1,35 @@
+Using a dataset that comes with R, i.e. ChickWeight, both perl and R calculated the variance for the 'weight' field as 5051.223. But, ML.FieldAggregates.Simple calculated it as 5042.484.
+
+Below is the code I used to do the test. It calculates basic statistics, using ML.FieldAggregates.Simple, for both the 'weight' and 'time' fields in the dataset. Plus, the code calculates the variance only for the 'weight' field using the TABLE function and the builtin VARIANCE function.
+
+IMPORT * FROM $;
+IMPORT ML,ML.TestML;
+
+ChickWeightField2MLNumericField( inDS, inField, FieldNumber, outDS ) := MACRO
+
+#uniquename(project2NumericField);
+NumericField %project2NumericField%(recordof(TestML.ChickWeight) r, unsigned c ) := TRANSFORM
+  self.id := c;
+  self.number := FieldNumber;
+  self.value := r.inField;
+END;
+
+outDS := project(inDS, %project2NumericField%(LEFT,COUNTER));
+
+ENDMACRO;
+
+ChickWeightField2MLNumericField(TestML.ChickWeight, weight, 1, JustWeightFromChickWeight);
+SinglesWeightOfChickWeight := ML.FieldAggregates(JustWeightFromChickWeight).Simple;
+output(SinglesWeightOfChickWeight,named('SinglesWeightOfChickWeight'));
+
+VarianceRec := RECORD
+  real var := VARIANCE(GROUP,ChickWeight.weight);
+END;
+
+VarianceWeight := table(ChickWeight, VarianceRec );
+output(VarianceWeight,named('VarianceWeight'));
+
+ChickWeightField2MLNumericField(TestML.ChickWeight, time, 2, JustTimeFromChickWeight);
+SinglesTimeOfChickWeight := ML.FieldAggregates(JustTimeFromChickWeight).Simple;
+output(SinglesTimeOfChickWeight,named('SinglesTimeOfChickWeight'));
+

@@ -1,0 +1,22 @@
+EXPORT myrec := RECORD
+        unsigned2 id;
+        unsigned8 field1;
+        integer8 field2;
+        integer8 field3;
+        integer8 field4;
+        integer8 field5;
+        integer8 field6;
+        integer8 field7;
+        integer8 field8;
+        integer8 field9;
+        integer8 field10;
+        integer8 field11;
+        integer8 field12;
+        integer8 field13;
+        integer8 field14;
+        unsigned4 field15;
+        unsigned4 field16;
+        integer8 field17;
+        unsigned4 field18;
+        unsigned2 field19;
+END;

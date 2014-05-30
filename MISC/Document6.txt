@@ -1,0 +1,3 @@
+
+//SinglesCheckWeight := FieldAggregates(TestML.ChickWeight).Simple;
+//output(SinglesCheckWeight,named('SinglesCheckWeight'));

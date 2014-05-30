@@ -1,0 +1,50 @@
+sub outEquation{
+my ( $eq )=@_;
+#  Each equations was created with: my $eq = makeEquation($lhs_qlen, $lhs_depth, $rlh_value, $terms, $func);
+      $lhs_qlen = $eq->{LHS}->{qlen};
+      my $lhs = 'D(' . $lhs_qlen . ',' . $eq->{LHS}->{depth} . ')';
+      my $rhs;
+      
+      if ( $eq->{RHS}->{value} !~ /^\s*$/ ){
+         $rhs = $eq->{RHS}->{value};
+ #print BUG "DEBUG In outEquation. RHS=\"$rhs\"\n" if $local_debug>0;
+      }
+      else{
+         my @term=();
+         my @uterm = @{$eq->{RHS}->{terms}};
+         while( scalar(@uterm) > 0 ){
+           
+            my $uterm = shift @uterm;        
+#print BUG "DEBUG In outEquation. uterm\->\{qlen\}=\"$uterm->{qlen}\", uterm\->\{depth\}=\"$uterm->{depth}\", uterm\->\{value\}=\"$uterm->{value}\", uterm\->\{deldepth\}=\"$uterm->{deldepth}\"\n" if $local_debug>0;
+ 
+            my $aterm;
+            if ( exists($uterm->{value}) ){
+               if ( exists($uterm->{deldepth}) ){
+                  $aterm = ( $uterm->{value}==0 )? 'Del(' . $lhs_qlen . ',' . $uterm->{deldepth} . ')' : $uterm->{value} . '+Del(' . $lhs_qlen . ',' . $uterm->{deldepth} . ')';
+               }
+               else{
+                  $aterm = $uterm->{value};
+               }
+            }
+            else{
+               if ( exists($uterm->{deldepth}) ){
+                  $aterm = 'D('. $uterm->{qlen} . ',' . $uterm->{depth} . ')' . '+Del(' . $lhs_qlen . ',' . $uterm->{deldepth} . ')';
+               }
+               elsif( exists($uterm->{add}) ){
+                  $aterm = ($uterm->{add}==0)? 'D('. $uterm->{qlen} . ',' . $uterm->{depth} . ')' : 'D('. $uterm->{qlen} . ',' . $uterm->{depth} . ')+' . $uterm->{add};
+               }
+               else{
+                  $aterm = 'D('. $uterm->{qlen} . ',' . $uterm->{depth} . ')';
+               }
+            }
+
+ #print BUG "DEBUG In outEquation. aterm=\"$aterm\"\n" if $local_debug>0;
+           push @term, $aterm;
+         }
+         
+         $rhs = (scalar(@term)>1)? $eq->{RHS}->{func} . '(' . join(",", @term) . ')' : $term[0];
+      }
+      
+      my $ThisEq = "$lhs=$rhs";
+#print BUG "DEBUG In outEquation. ThisEq=\"$ThisEq\"\n" if $local_debug>0;
+}
